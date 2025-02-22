@@ -1,0 +1,307 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Envelope Algorithms</title><meta name="generator" content="MATLAB 8.5"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2016-02-23"><meta name="DC.source" content="Algorithms_html.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Envelope Algorithms</h1><!--introduction--><p>Here we explain the basics of fitting an envelope with different algorithms. We explain the fitting of a generic M-envelope of span(U) with a symmetric positive definite matrix M&gt;0 and a symmetric positive semi-definite matrix U&gt;=0.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Load the package</a></li><li><a href="#2">Simulate the two matrices M and U with an envelope structure</a></li><li><a href="#3">Envelope estimation from the 1D algorithm</a></li><li><a href="#4">Envelope estimation from the ECD algorithm</a></li><li><a href="#5">Envelope estimation from full Grassmannian (FG) optimization</a></li><li><a href="#6">Envelope component screeing (ECS) algorithms</a></li></ul></div><h2>Load the package<a name="1"></a></h2><pre class="codeinput">clear <span class="string">all</span>;
+cd <span class="string">D:\EnvelopeComputing\EnvelopeAlgorithms</span>; <span class="comment">% change directory to the package folder</span>
+setpaths;   <span class="comment">% load all the functions in the package directory</span>
+rng(2016);  <span class="comment">% set random seed</span>
+</pre><h2>Simulate the two matrices M and U with an envelope structure<a name="2"></a></h2><p>M and U both have size p-by-p and the envelope has dimension u</p><pre class="codeinput">p = 20;
+u = 5;
+<span class="comment">% randomly generate a semi-orthogonal p-by-u basis matrix (Gamma) for the</span>
+<span class="comment">% envelope and its orthogonal completion (Gamma0) of dimension p-by-(p-u)</span>
+Gamma = orth(rand(p,u));
+Gamma0 = null(Gamma');
+<span class="comment">% randomly generated symmetric positive definite matrices, M and U, to have</span>
+<span class="comment">% an exact u-dimensional envelope structure</span>
+Phi = rand(u,u); Phi = Phi*Phi';
+Omega = rand(u,u); Omega = Omega*Omega';
+Omega0 = rand(p-u,p-u); Omega0 = Omega0*Omega0';
+M = Gamma*Omega*Gamma' + Gamma0*Omega0*Gamma0';
+U = Gamma*Phi*Gamma';
+<span class="comment">% randomly generate symmetric positive definite matrices, Mhat and Uhat, as</span>
+<span class="comment">% root-n consistent sample estimators for M and U</span>
+n = 200;
+X = mvnrnd(zeros(p,1),M,n);
+Y = mvnrnd(zeros(p,1),U,n);
+Mhat = X'*X/n;
+Uhat = Y'*Y/n;
+</pre><h2>Envelope estimation from the 1D algorithm<a name="3"></a></h2><p>The 1D algorithm (Cook and Zhang 2016 JCGS) is the most reliable envelope estimation method in the literature. It requires no initial value input and is guarenteed to converge at a root-n consistent solution. However, the 1D envelope estimators are typically not the maximum likelihood estimator (MLE). In specific envelope models, the MLE should be obtained through full Grassmannian (FG) envelope estimation where the 1D algorithm estimators are often used as an initial value. In the 1D algorithm, we are using 500 as the default maximum number of iterations. If you want to change this number, please go to the "first1D.m" file.</p><pre class="codeinput"><span class="comment">% computational time and estimation error</span>
+tic
+Ghat_1D = manifold1D(Mhat,Uhat,u);
+toc
+disp(norm(Gamma*Gamma'-Ghat_1D*Ghat_1D',<span class="string">'fro'</span>));
+</pre><pre class="codeoutput">Elapsed time is 1.627400 seconds.
+    0.4063
+
+</pre><h2>Envelope estimation from the ECD algorithm<a name="4"></a></h2><p>The Envelope Coordinate Descent (ECD) algorithm (Cook and Zhang 2016+, manuscript, "Fast Envelope Algorithms") is developed under the 1D algorithm framework. Thus, the ECD algorithm and the 1D algorithm share the same statistical properties (Fisher consistency, root-n consistency, etc.) The ECD algorithm is much faster than the 1D algorithm. In the ECD algorithm, we are using 2000 as the default maximum number of iterations. If you want to change this number, please go to the "ECD.m" file.</p><pre class="codeinput"><span class="comment">% computational time and estimation error</span>
+tic
+Ghat_ECD = ECD(Mhat,Uhat,u);
+toc
+disp(norm(Gamma*Gamma'-Ghat_ECD*Ghat_ECD',<span class="string">'fro'</span>));
+</pre><pre class="codeoutput">Elapsed time is 0.041698 seconds.
+    0.4063
+
+</pre><h2>Envelope estimation from full Grassmannian (FG) optimization<a name="5"></a></h2><p>The full Grassmannian (FG) optimization means directly optimize the envelope objective function over p-by-u Grassmannian. The core optimization part, which is a form of conjugate gradient optimization, is borrowed from the "sg_min" Matlab package, which is inside the "LDR" Matlab package. Because the envelope objective function is non-convex and has multiple local minima, the FG optimization is highly sensitive to the starting value. We recommand to use FG optimization only when p and u are small. Unlike the 1D and the ECD algorithms, the FG optimization requires a good (e.g. root-n consistent) initial value to begin with. In practice, either the 1D or the ECD estimator can be a good initial value for FG optimization. In the FG optimization, we are using 500 as the default maximum number of iterations. If you want to change this number, please go to the "manifoldFG.m" file.</p><pre class="codeinput"><span class="comment">% Using a random initial value</span>
+tic
+Ghat_FG = manifoldFG(Mhat,Uhat,u,orth(rand(p,u)));
+toc
+disp(norm(Gamma*Gamma'-Ghat_FG*Ghat_FG',<span class="string">'fro'</span>));
+<span class="comment">% Using 1D algorithm estimator as initial value</span>
+tic
+Ghat_FG = manifoldFG(Mhat,Uhat,u,Ghat_1D);
+toc
+disp(norm(Gamma*Gamma'-Ghat_FG*Ghat_FG',<span class="string">'fro'</span>));
+<span class="comment">% Using ECD algorithm estimator as initial value</span>
+tic
+Ghat_FG = manifoldFG(Mhat,Uhat,u,Ghat_ECD);
+toc
+disp(norm(Gamma*Gamma'-Ghat_FG*Ghat_FG',<span class="string">'fro'</span>));
+</pre><pre class="codeoutput">Elapsed time is 1.303029 seconds.
+    1.4652
+
+Elapsed time is 2.436714 seconds.
+    0.4081
+
+Elapsed time is 2.907476 seconds.
+    0.4081
+
+</pre><h2>Envelope component screeing (ECS) algorithms<a name="6"></a></h2><p>All the above envelope estimation methods (1D, ECD, FG, among others) are not directly applicable to n&lt;p settings, therefore, the Envelope component screeing (ECS) algorithm (Cook and Zhang 2016+, manuscript, "Fast Envelope Algorithms") is developed as a pre-screening method for envelope estimation in high-dimensional settings. After applying the ECS algorithm, the ECD algorithm or the 1D algorithm can be applied to get an estimator for the original envelope.</p><pre class="codeinput"><span class="comment">% Generate data matrices Mhat and Uhat with dimension p larger than sample size n.</span>
+p = 2000;
+u = 5;
+n = 100;
+Gamma = orth(rand(p,u));
+Gamma0 = null(Gamma');
+Phi = rand(u,u); Phi = Phi*Phi'; Phi = Phi/norm(Phi,<span class="string">'fro'</span>);
+Omega = rand(u,u); Omega = Omega*Omega'; Omega = Omega/norm(Omega,<span class="string">'fro'</span>);
+Omega0 = rand(p-u,p-u); Omega0 = Omega0*Omega0'; Omega0 = Omega0/norm(Omega0,<span class="string">'fro'</span>);
+M = Gamma*(Omega+eye(u))*Gamma' + Gamma0*Omega0*Gamma0';
+U = Gamma*Phi*Gamma';
+X = mvnrnd(zeros(p,1),M,n);
+Y = mvnrnd(zeros(p,1),U,n);
+Mhat = X'*X/n;
+Uhat = Y'*Y/n;
+</pre><p>ECS1 is the screening method that keeps a user-specified number of components.</p><pre class="codeinput">k = 50; <span class="comment">% reduce the dimension from p to k</span>
+[A, Mnew, Unew] = ECS1(Mhat,Uhat,k);
+<span class="comment">% A is p-by-k basis matrix for the selected envelope components</span>
+<span class="comment">% Mnew and Unew are the k-by-k reduced matrices</span>
+Ghat_ECS = A*ECD(Mnew,Unew,u);  <span class="comment">% p-by-u basis matrix for the envelope</span>
+disp(norm(Gamma*Gamma'-Ghat_ECS*Ghat_ECS',<span class="string">'fro'</span>));
+</pre><pre class="codeoutput">    1.0633
+
+</pre><p>ECS2 is the screening method that select the number of components to keep in a data-driven way.</p><pre class="codeinput">[k, A, Mnew, Unew] = ECS2(Mhat,Uhat,-1/n);
+disp(k) <span class="comment">% display how many components were kept after screening</span>
+Ghat_ECS = A*ECD(Mnew,Unew,u);
+disp(norm(Gamma*Gamma'-Ghat_ECS*Ghat_ECS',<span class="string">'fro'</span>));
+</pre><pre class="codeoutput">    42
+
+    1.0633
+
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Envelope Algorithms
+% Here we explain the basics of fitting an envelope with different
+% algorithms. We explain the fitting of a generic M-envelope of span(U)
+% with a symmetric positive definite matrix M>0 and a symmetric positive
+% semi-definite matrix U>=0.
+%% Load the package
+clear all;
+cd D:\EnvelopeComputing\EnvelopeAlgorithms; % change directory to the package folder
+setpaths;   % load all the functions in the package directory
+rng(2016);  % set random seed
+
+%% Simulate the two matrices M and U with an envelope structure
+% M and U both have size p-by-p and the envelope has dimension u
+p = 20; 
+u = 5;	
+% randomly generate a semi-orthogonal p-by-u basis matrix (Gamma) for the
+% envelope and its orthogonal completion (Gamma0) of dimension p-by-(p-u)
+Gamma = orth(rand(p,u));    
+Gamma0 = null(Gamma'); 
+% randomly generated symmetric positive definite matrices, M and U, to have
+% an exact u-dimensional envelope structure
+Phi = rand(u,u); Phi = Phi*Phi';   
+Omega = rand(u,u); Omega = Omega*Omega';
+Omega0 = rand(p-u,p-u); Omega0 = Omega0*Omega0';
+M = Gamma*Omega*Gamma' + Gamma0*Omega0*Gamma0';
+U = Gamma*Phi*Gamma';
+% randomly generate symmetric positive definite matrices, Mhat and Uhat, as
+% root-n consistent sample estimators for M and U
+n = 200;
+X = mvnrnd(zeros(p,1),M,n);
+Y = mvnrnd(zeros(p,1),U,n);
+Mhat = X'*X/n;
+Uhat = Y'*Y/n;
+
+
+%% Envelope estimation from the 1D algorithm
+% The 1D algorithm (Cook and Zhang 2016 JCGS) is the most reliable envelope
+% estimation method in the literature. It requires no initial value input
+% and is guarenteed to converge at a root-n consistent solution. However,
+% the 1D envelope estimators are typically not the maximum likelihood
+% estimator (MLE). In specific envelope models, the MLE should be obtained
+% through full Grassmannian (FG) envelope estimation where the 1D algorithm
+% estimators are often used as an initial value.
+% In the 1D algorithm, we are using 500 as the default maximum number of iterations.
+% If you want to change this number, please go to the "first1D.m" file.
+
+% computational time and estimation error
+tic
+Ghat_1D = manifold1D(Mhat,Uhat,u);
+toc
+disp(norm(Gamma*Gamma'-Ghat_1D*Ghat_1D','fro'));
+
+%% Envelope estimation from the ECD algorithm
+% The Envelope Coordinate Descent (ECD) algorithm (Cook and Zhang 2016+,
+% manuscript, "Fast Envelope Algorithms") is developed under the 1D 
+% algorithm framework. Thus, the ECD algorithm and the 1D algorithm
+% share the same statistical properties (Fisher consistency, root-n
+% consistency, etc.) The ECD algorithm is much faster than the 1D
+% algorithm. In the ECD algorithm, we are using 2000 as the default
+% maximum number of iterations.
+% If you want to change this number, please go to the "ECD.m" file.
+
+% computational time and estimation error
+tic
+Ghat_ECD = ECD(Mhat,Uhat,u);
+toc
+disp(norm(Gamma*Gamma'-Ghat_ECD*Ghat_ECD','fro'));
+
+%% Envelope estimation from full Grassmannian (FG) optimization
+% The full Grassmannian (FG) optimization means directly optimize the
+% envelope objective function over p-by-u Grassmannian. The core
+% optimization part, which is a form of conjugate gradient optimization, 
+% is borrowed from the "sg_min" Matlab package, which is inside the "LDR"
+% Matlab package. Because the envelope objective function is non-convex and 
+% has multiple local minima, the FG optimization is highly sensitive to the
+% starting value. We recommand to use FG optimization only when p and u are
+% small. Unlike the 1D and the ECD algorithms, the FG optimization requires
+% a good (e.g. root-n consistent) initial value to begin with. In practice,
+% either the 1D or the ECD estimator can be a good initial value for FG optimization.
+% In the FG optimization, we are using 500 as the default
+% maximum number of iterations.
+% If you want to change this number, please go to the "manifoldFG.m" file.
+ 
+% Using a random initial value
+tic
+Ghat_FG = manifoldFG(Mhat,Uhat,u,orth(rand(p,u)));
+toc
+disp(norm(Gamma*Gamma'-Ghat_FG*Ghat_FG','fro'));
+% Using 1D algorithm estimator as initial value
+tic
+Ghat_FG = manifoldFG(Mhat,Uhat,u,Ghat_1D);
+toc
+disp(norm(Gamma*Gamma'-Ghat_FG*Ghat_FG','fro'));
+% Using ECD algorithm estimator as initial value
+tic
+Ghat_FG = manifoldFG(Mhat,Uhat,u,Ghat_ECD);
+toc
+disp(norm(Gamma*Gamma'-Ghat_FG*Ghat_FG','fro'));
+
+%% Envelope component screeing (ECS) algorithms
+% All the above envelope estimation methods (1D, ECD, FG, among others) are not directly applicable to
+% n<p settings, therefore, the Envelope component screeing (ECS) algorithm (Cook and Zhang 2016+,
+% manuscript, "Fast Envelope Algorithms") is developed as a pre-screening method
+% for envelope estimation in high-dimensional settings. After applying the
+% ECS algorithm, the ECD algorithm or the 1D algorithm can be applied to
+% get an estimator for the original envelope.
+
+% Generate data matrices Mhat and Uhat with dimension p larger than sample size n.
+p = 2000; 
+u = 5;	
+n = 100;
+Gamma = orth(rand(p,u));
+Gamma0 = null(Gamma');
+Phi = rand(u,u); Phi = Phi*Phi'; Phi = Phi/norm(Phi,'fro');
+Omega = rand(u,u); Omega = Omega*Omega'; Omega = Omega/norm(Omega,'fro');
+Omega0 = rand(p-u,p-u); Omega0 = Omega0*Omega0'; Omega0 = Omega0/norm(Omega0,'fro');
+M = Gamma*(Omega+eye(u))*Gamma' + Gamma0*Omega0*Gamma0';
+U = Gamma*Phi*Gamma';
+X = mvnrnd(zeros(p,1),M,n);
+Y = mvnrnd(zeros(p,1),U,n);
+Mhat = X'*X/n;
+Uhat = Y'*Y/n;
+%%
+% ECS1 is the screening method that keeps a user-specified number of components.
+k = 50; % reduce the dimension from p to k
+[A, Mnew, Unew] = ECS1(Mhat,Uhat,k);    
+% A is p-by-k basis matrix for the selected envelope components
+% Mnew and Unew are the k-by-k reduced matrices
+Ghat_ECS = A*ECD(Mnew,Unew,u);  % p-by-u basis matrix for the envelope
+disp(norm(Gamma*Gamma'-Ghat_ECS*Ghat_ECS','fro'));
+%%
+% ECS2 is the screening method that select the number of components to keep in a data-driven way.
+[k, A, Mnew, Unew] = ECS2(Mhat,Uhat,-1/n); 
+disp(k) % display how many components were kept after screening
+Ghat_ECS = A*ECD(Mnew,Unew,u);
+disp(norm(Gamma*Gamma'-Ghat_ECS*Ghat_ECS','fro'));
+
+
+
+
+##### SOURCE END #####
+--></body></html>
