@@ -21,6 +21,7 @@ SDR Shrinkage (SDRS), is a multiclass distribution-free Sufficient Dimension Red
 - `SDRshrinkage.Rproj`: RStudio project file.
 - `figures.R`: Script for generating figures from the paper.
 - `wrapper_fns.R`: Wrapper functions used in the analysis.
+  
 Note: Analysis is primarily in R, matlab is used for the ENDS methods only.
 
 If you find this work useful, please cite our paper:
