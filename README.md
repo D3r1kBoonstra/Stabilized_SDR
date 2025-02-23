@@ -15,12 +15,13 @@ SDR Shrinkage (SDRS), is a multiclass distribution-free Sufficient Dimension Red
 
 - `datasets/`: Contains datasets used for real data applications.
 - `mc_sims/`: R Scripts for Monte Carlo simulations.
-- `real_data_applications/`: Scripts for real data applications. Note: analysis is primarily in R, matlab is used for the ENDS methods. 
+- `real_data_applications/`: Scripts for real data applications. 
 - `saved_sims_applications/`: Saved results from simulations and applications.
 - `Requirements.R`: R script listing required packages.
 - `SDRshrinkage.Rproj`: RStudio project file.
 - `figures.R`: Script for generating figures from the paper.
 - `wrapper_fns.R`: Wrapper functions used in the analysis.
+Note: Analysis is primarily in R, matlab is used for the ENDS methods only.
 
 If you find this work useful, please cite our paper:
 
