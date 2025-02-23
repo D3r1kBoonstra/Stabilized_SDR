@@ -4,19 +4,29 @@
 
 This repository accompanies the research paper:
 
-**"Title"**
+**"Sufficient Dimension Reduction Shrinkage for Improved Quadratic
+Discriminant Classification"** 
 
-*Authors:* 
+*Authors:* Derik T. Boonstra, Rakheon Kim, Gabriel J. Odom, and Dean M. Young
 
-The SDRshrinkage project introduces a novel precision-matrix regularization technique to enhance sufficient dimension reduction (SDR) for supervised classification. By incorporating shrinkage estimators, this method stabilizes the linear dimension reduction projection matrix, leading to improved classification accuracy under Quadratic Discriminant Analysis (QDA).
+SDR Shrinkage (SDRS), is a multiclass distribution-free Sufficient Dimension Reduction (SDR) method that employs user-specified precision-matrix shrinkage estimators to stabilize both the projection-matrix and supervised classifier. 
 
 ## Repository Structure
 
 - `datasets/`: Contains datasets used for real data applications.
 - `mc_sims/`: R Scripts for Monte Carlo simulations.
-- `real_data_applications/`: Analysis scripts for real data applications.
+- `real_data_applications/`: Scripts for real data applications.
 - `saved_sims_applications/`: Saved results from simulations and applications.
 - `Requirements.R`: R script listing required packages.
 - `SDRshrinkage.Rproj`: RStudio project file.
 - `figures.R`: Script for generating figures from the paper.
 - `wrapper_fns.R`: Wrapper functions used in the analysis.
+
+If you find this work useful, please cite our paper:
+
+@article{boonstra2025,  
+  author = {Boonstra, Derik T. and Kim, Rakheon and Odom, Gabriel J. and Young, Dean M.},  
+  title = {Sufficient Dimension Reduction Shrinkage for Improved Quadratic Discriminant Classification},  
+  journal = {tbd},  
+  year = {tbd},    
+}
