@@ -22,7 +22,7 @@ sim_wrapper <- function(mu, Sigma, n, ni, nsims, lambdas, type = "L1", gamma = N
       train <- rsample::training(splits)
       test <- rsample::testing(splits)
       
-      methods <- list(NULL, "Haff", "RidgeShrinkage", "BGP16", "SCPME")
+      methods <- list(NULL, "Haff", "Wang", "Bodnar", "MRY")
       
       mods <- lapply(seq_along(methods), function(i){
         sdr(as.matrix(train[,-1]), grouping = train$class, method = "SDRS", prec.est = methods[[i]], 
@@ -65,7 +65,7 @@ sim_summary <- function(sim){
       x <- x |> 
         group_by(method) |> 
         group_split() |> 
-        setNames(c("MLE", "Haff", "Wang", "Bodnar", "MRY", "qdf")) |> 
+        setNames(c("S_inv", "Haff", "Wang", "Bodnar", "MRY", "QDA")) |> 
         lapply(function(x) {
           x <- x |> 
             select(-method, -ni)
@@ -95,7 +95,7 @@ sim_boxplots <- function(sim){
     ggplot(aes(dim, error, fill =  method))+
     geom_boxplot(outliers = FALSE)+
     geom_hline(aes(yintercept = med, color = "1"), data = qdf_meds)+
-    scale_color_manual(values = "red", labels = "QDF")+
+    scale_color_manual(values = "red", labels = "QDA")+
     facet_wrap(~ni, nrow = 3, scales = "free_y")+
     scale_fill_manual(values = c("purple", "#6495ED", "#21918c", "#5ec962", "#fde725"))+
     labs(y = expression(bar("CER")), 
@@ -115,7 +115,7 @@ sdrs_sim <- function(data, lambdas, nsims, gamma = NULL, type = "L1", standardiz
     train <- lapply(splits, rsample::training)
     test <- lapply(splits, rsample::testing)
     
-    methods <- list(NULL, "Haff", "RidgeShrinkage", "BGP16" , "SCPME")
+    methods <- list(NULL, "Haff", "Wang", "Bodnar" , "MRY")
     
     # SYS classifier model with training
     mods <- lapply(seq_along(train), function(j){
