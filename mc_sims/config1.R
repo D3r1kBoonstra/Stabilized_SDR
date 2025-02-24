@@ -1,7 +1,4 @@
-library("tidyverse");theme_set(theme_minimal())
-library("sdr")
 source("wrapper_fns.R")
-
 
 # Configuration -----------------------------------------------------------
 p <- 10

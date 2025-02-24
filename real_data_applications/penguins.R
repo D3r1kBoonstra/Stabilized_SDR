@@ -1,6 +1,3 @@
-# Packages ----------------------------------------------------------------
-library("tidyverse");theme_set(theme_minimal())
-library("sdrs")
 source("wrapper_fns.R")
 
 #  Reading Data & Cleaning ------------------------------------------------

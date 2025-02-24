@@ -1,5 +1,4 @@
-library("tidyverse");library("qqplotr");theme_set(theme_minimal())
-library("sdr")
+library("tidyverse");theme_set(theme_minimal())
 # MC Sims -----------------------------------------------------------------
 ## Wrapper fn to perform MC sim in paper
 sim_wrapper <- function(mu, Sigma, n, ni, nsims, lambdas, type = "L1", gamma = NULL){
@@ -25,7 +24,7 @@ sim_wrapper <- function(mu, Sigma, n, ni, nsims, lambdas, type = "L1", gamma = N
       methods <- list(NULL, "Haff", "Wang", "Bodnar", "MRY")
       
       mods <- lapply(seq_along(methods), function(i){
-        sdr(as.matrix(train[,-1]), grouping = train$class, method = "SDRS", prec.est = methods[[i]], 
+        sdr::sdr(as.matrix(train[,-1]), grouping = train$class, method = "SDRS", prec.est = methods[[i]], 
              lam = lambdas, type = type, gamma = gamma)
       })
       
@@ -120,7 +119,7 @@ sdrs_sim <- function(data, lambdas, nsims, gamma = NULL, type = "L1", standardiz
     # SYS classifier model with training
     mods <- lapply(seq_along(train), function(j){
       lapply(seq_along(methods), function(i){
-        sdr(train[[j]][,-1], grouping = train[[j]]$class, method = "SDRS", prec.est = methods[[i]], 
+        sdr::sdr(train[[j]][,-1], grouping = train[[j]]$class, method = "SDRS", prec.est = methods[[i]], 
             lam = lambdas, gamma = gamma, 
             type = type, standardize_xbar = standardize_xbar)
       })
@@ -419,8 +418,7 @@ comp_sim <- function(data, ends_u = 1, sir_d = 0, nsims, ncores = parallel::dete
   write_csv(as.data.frame(nsims), file.path(sim_data_pth, "nsims.csv"))
   write_csv(data, file.path(sim_data_pth, "data.csv"))
   
-  set.seed(1)
-  msda_cv <- TULIP::cv.msda(as.matrix(data[,-1]), y = as.numeric(data$class), nfolds = 10)
+ 
   
   errors <- parallel::mclapply(1:nsims, function(j){
     set.seed(j)
@@ -436,6 +434,7 @@ comp_sim <- function(data, ends_u = 1, sir_d = 0, nsims, ncores = parallel::dete
       sir_pred <- (MASS::qda(x = sdr::project(as.matrix(train[[i]][,-1]), t(sir.lasso$beta)), grouping = train[[i]]$class) |> 
                      predict(newdata = sdr::project(as.matrix(test[[i]][,-1]), t(sir.lasso$beta))))$class
       
+      msda_cv <- TULIP::cv.msda(as.matrix(train[[i]][,-1]), y = as.numeric(train[[i]]$class), nfolds = 10)
       msda_pred <- TULIP::msda(as.matrix(train[[i]][,-1]), y = as.numeric(train[[i]]$class), testx = as.matrix(test[[i]][,-1]), lambda = msda_cv$lambda.min)$pred
       
       if(length(unique(data$class)) == 2){
@@ -460,8 +459,15 @@ comp_sim <- function(data, ends_u = 1, sir_d = 0, nsims, ncores = parallel::dete
   
   message("starting ENDS Matlab")
   
-  ## Change directory to yours
-  system("/Applications/MATLAB_R2023b.app/bin/matlab -nodisplay -batch \"run('~/Library/CloudStorage/GoogleDrive-derik.todd@gmail.com/My Drive/Research/PPP/R/prec_est/real_data_sims/ends.m'); exit\"")
+  script_path <- here::here("real_data_applications", "ends.m")
+  
+  ## Change Matlab location to yours
+  matlab_cmd <- sprintf(
+    '/Applications/MATLAB_R2023b.app/bin/matlab -nodisplay -batch "run(\'%s\'); exit"',
+    script_path
+  )
+  # Run MATLAB from R
+  system(matlab_cmd)
   
   ends_error <- read_csv(file.path(sim_data_pth, "ENDS_error.csv"),
                          col_names = FALSE,
