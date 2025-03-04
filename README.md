@@ -6,7 +6,7 @@ This repository accompanies the research paper:
 
 **"Precision Matrix Regularization in Sufficient Dimension Reduction for Improved Quadratic Discriminant Classification"** 
 
-*Authors:* Derik T. Boonstra, Rakheon Kim, Gabriel J. Odom, and Dean M. Young
+*Authors:* Derik T. Boonstra, Rakheon Kim, and Dean M. Young
 
 SDR Shrinkage (SDRS), is a multiclass distribution-free Sufficient Dimension Reduction (SDR) method that employs user-specified precision-matrix shrinkage estimators to stabilize the projection-matrix and supervised classifier. 
 
@@ -26,7 +26,7 @@ Note: Analysis is primarily in R. Matlab is used for the ENDS methods only.
 If you find this work useful, please cite our paper:
 
 @article{boonstra2025,  
-  author = {Boonstra, Derik T. and Kim, Rakheon and Odom, Gabriel J. and Young, Dean M.},  
+  author = {Boonstra, Derik T. and Kim, Rakheon and Young, Dean M.},  
   title = {Precision Matrix Regularization in Sufficient Dimension Reduction for Improved Quadratic Discriminant Classification},  
   journal = {tbd},  
   year = {tbd},    
