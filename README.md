@@ -1,4 +1,4 @@
-# SDR Shrinkage (SDRS)
+# Stabilized SDR (SSDR)
 
 ## Overview
 
@@ -8,7 +8,7 @@ This repository accompanies the research paper:
 
 *Authors:* Derik T. Boonstra, Rakheon Kim, and Dean M. Young
 
-SDR Shrinkage (SDRS), is a multiclass distribution-free Sufficient Dimension Reduction (SDR) method that employs user-specified precision-matrix shrinkage estimators to stabilize the projection-matrix and supervised classifier. 
+Stabilized SDR (SSDR), is a multiclass and distribution-free Sufficient Dimension Reduction (SDR) method that employs user-specified precision-matrix shrinkage estimators to stabilize the projection-matrix and supervised classifier. 
 
 ## Repository Structure
 
