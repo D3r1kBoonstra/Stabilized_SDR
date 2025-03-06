@@ -22,7 +22,7 @@ sim_as_tb <- function(sim, sim_type = "data_sdr"){
         do.call(rbind, args = _) |> 
         mutate("config" = rep(name[[i]], n()), 
                "ni" = rep(c("p + 1", "2p", "6p"), each = n()/3)
-               )
+        )
     }
   } else if(sim_type == "data_sdr"){
     name <- names(sim) |> 
@@ -59,7 +59,7 @@ sim_as_tb <- function(sim, sim_type = "data_sdr"){
 }
 
 
-# MC Sim SDRS Boxplots -------------------------------------------------------
+# MC Sim SSDR Boxplots -------------------------------------------------------
 sims <- miscset::lload("./saved_sims", pattern = "config") |> 
   sim_as_tb(sim_type = "sim") |> 
   mutate("config" = case_when(config == "config1" ~ "Configuration 1", 
@@ -94,16 +94,16 @@ sims |>
   geom_hline(aes(yintercept = med, color = "1"), data = qdf_meds)+
   scale_color_manual(values = "red", labels = "QDA")+
   scale_fill_manual(values = c("purple", "#6495ED", "#21918c", "#5ec962", "#fde725"), 
-                    labels = c(bquote("SDRS"["S"^{-1}]), expression("SDRS"["Haff"]), 
-                               expression("SDRS"["Wang"]), expression("SDRS"["Bod"]), 
-                               expression("SDRS"["MRY"])))+
+                    labels = c(bquote("SSDR"["S"^{-1}]), expression("SSDR"["Haff"]), 
+                               expression("SSDR"["Wang"]), expression("SSDR"["Bod"]), 
+                               expression("SSDR"["MRY"])))+
   scale_shape_manual(values = c(1, 2, 3, 4, 5), 
-                     labels = c(bquote("SDRS"["S"^{-1}]), expression("SDRS"["Haff"]), 
-                                expression("SDRS"["Wang"]), expression("SDRS"["Bod"]), 
-                                expression("SDRS"["MRY"])))+
+                     labels = c(bquote("SSDR"["S"^{-1}]), expression("SSDR"["Haff"]), 
+                                expression("SSDR"["Wang"]), expression("SSDR"["Bod"]), 
+                                expression("SSDR"["MRY"])))+
   facet_grid(cols = vars(ni), rows = vars(config), scales = "fixed",
              labeller = label_bquote(cols = n[i] == .(as.character(ni)))
-             )+
+  )+
   theme(strip.background = element_rect(fill="lightgrey"), 
         legend.position = "bottom", 
         axis.text.x = element_blank(), 
@@ -172,10 +172,10 @@ sim_long |>
              alpha = .5)+
   geom_hline(aes(yintercept = med, color = "1"), data = qda_med)+
   facet_wrap(~dataset, scales = "free_y", nrow = 3)+
-  scale_shape_manual(values = 1:5, labels = c("MSDA", "SIRL", "ENDS","QDAP", expression("SDRS"["MRY"])))+
+  scale_shape_manual(values = 1:5, labels = c("MSDA", "SIRL", "ENDS","QDAP", expression("SSDR"["MRY"])))+
   scale_color_manual(values = "red", labels = "QDA")+
   scale_fill_manual(values = c("#F28E2B", "#B07AA1", "#4E79A7", "#76B7B2", "#fde725"), 
-                    labels = c("MSDA", "SIRL", "ENDS","QDAP", expression("SDRS"["MRY"])))+
+                    labels = c("MSDA", "SIRL", "ENDS","QDAP", expression("SSDR"["MRY"])))+
   theme(strip.background =element_rect(fill="lightgrey"), 
         axis.text.x = element_blank(), 
         axis.title.x = element_blank(),
@@ -193,18 +193,18 @@ sim_long |>
   guides(color = guide_legend(order = 1), 
          shape = guide_legend(override.aes = list(alpha = 1)))
 
-# Real Data Application SDRS Boxplots (Not Used) -----------------------------------------------------------
+# Real Data Application SSDR Boxplots (Not Used) -----------------------------------------------------------
 sims_sdr <- miscset::lload("./saved_sims", pattern = "_sdrs.RData") |> 
   sim_as_tb() |> 
   mutate(
-  "dataset" = fct_relevel(as_factor(dataset), 
-                          "autism", "bc", "div","ion",  "spect", "peng",
-                          "wheat", "ecoli", "beans") |> 
-    fct_recode("Autism" = "autism",  "Breast Cancer" = "bc", 
-               "Divorce" = "div", "Ionosphere" = "ion",  
-               "SPECT Heart" = "spect", "Penguins" = "peng",
-               "Wheat Seeds" = "wheat", "Ecoli" = "ecoli", 
-               "Dry Beans" = "beans") 
+    "dataset" = fct_relevel(as_factor(dataset), 
+                            "autism", "bc", "div","ion",  "spect", "peng",
+                            "wheat", "ecoli", "beans") |> 
+      fct_recode("Autism" = "autism",  "Breast Cancer" = "bc", 
+                 "Divorce" = "div", "Ionosphere" = "ion",  
+                 "SPECT Heart" = "spect", "Penguins" = "peng",
+                 "Wheat Seeds" = "wheat", "Ecoli" = "ecoli", 
+                 "Dry Beans" = "beans") 
   )
 
 sims_long <-  sims_sdr |> 
@@ -217,7 +217,7 @@ sims_long <-  sims_sdr |>
 
 meds_sdr <- sims_sdr |> 
   summarise("med" = median(QDA), .by = dataset)
-  
+
 outliers <- sims_long |>
   group_by(method, dataset) |>
   filter(cer < quantile(cer, .25) - 1.5*IQR(cer) | 
