@@ -17,7 +17,7 @@ Stabilized SDR (SSDR), is a multiclass and distribution-free Sufficient Dimensio
 - `real_data_applications/`: Scripts for real data applications. 
 - `saved_sims/`: Saved results from simulations and applications.
 - `Requirements.R`: R script listing required packages. Run before any computations. 
-- `SDRshrinkage.Rproj`: RStudio project file. To efficiently run code, open project first. 
+- `Stabilized_SDR.Rproj`: RStudio project file. To efficiently run code, open project first. 
 - `figures.R`: Script for generating figures from the paper.
 - `wrapper_fns.R`: Wrapper functions used in the analysis.
   
